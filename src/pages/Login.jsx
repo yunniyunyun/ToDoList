@@ -67,7 +67,7 @@ function Login() {
                         minLength: { value: 8, message: "密碼至少為 8 碼" }
                       })}/>
                     <span>{errors.password?.message}</span>
-                    <input class="formControls_btnSubmit" type="submit" onclick="javascript:location.href='#todoListPage'" value="登入"/>
+                    <input class="formControls_btnSubmit" type="submit" onClick="javascript:location.href='#todoListPage'" value="登入"/>
                     <Link className='formControls_btnLink' to="SignUp">註冊帳號</Link>
                 </form>
             </div>

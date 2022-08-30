@@ -6,8 +6,75 @@ import { useAuth } from "../components/Context";
 function ToDo() {
   const { useState } = React;
   const { token} = useAuth();
-  // const token = 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI5NiIsInNjcCI6InVzZXIiLCJhdWQiOm51bGwsImlhdCI6MTY2MTgzNzY0MSwiZXhwIjoxNjYzMTMzNjQxLCJqdGkiOiI3MTgwMzI4ZS1iZmQxLTRhY2EtODRmYS1iZmJhNGFmNDRlZDQifQ.R3h1DSpIEeh0Ips_kSjNpGMyc69Z0nTXUBV0dLNL6LU'
   const [todos, setTodos] = useState([]);
+  const [inputItem, setInputItem] = useState("");
+  const PostDoTo = () => {
+    if (inputItem.trim() === "") {
+      return;
+    }
+    const _url = "https://todoo.5xcamp.us/todos";
+    fetch(_url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'authorization': token
+        },
+      body: JSON.stringify({
+        todo: {"content":inputItem}
+        })
+      })
+      .then(res => {
+        return res.json()
+      })
+      .then(res => {
+        setTodos([...todos, {id:res.id, content:res.content, completed_at:null}])
+        setInputItem("")
+      })
+  };
+  const ToggleDoTo = (id) => {
+    const _url = "https://todoo.5xcamp.us/todos/"+id+"/toggle";
+    fetch(_url, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'authorization': token
+        }
+      })
+      .then(res => {
+        return res.json()
+      })
+      .then(res =>{
+        setTodos(
+          todos.map((data) =>
+            data.id == id ? res : data
+          ))
+      })
+  };
+  // 無法清除全部
+  const ClearCompleted = () =>{
+    let completedList = todos.filter((data) => data.completed_at);
+    setTodos(todos.filter((data) => data.completed_at == null))
+    for (const data of completedList) {
+      const { id } = data;
+      DeleteDoTo(id);
+    }
+  }
+  const DeleteDoTo = (id) => {
+    const _url = "https://todoo.5xcamp.us/todos/"+id;
+    fetch(_url, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        'authorization': token
+        }
+      })
+      .then(res => {
+        return res.json()
+      })
+      .then(res => {
+        setTodos(todos.filter((data) => data.id != id))
+      })
+  };
   const GetData = () => {
     const _url = "https://todoo.5xcamp.us/todos";
     fetch(_url, {
@@ -53,11 +120,17 @@ function ToDo() {
             type="checkbox"
             value="true"
             checked={completed_at}
+            onChange={() => {
+              ToggleDoTo(id);
+            }}
           />
           <span>{content}</span>
         </label>
         <a
-          href="#"
+          href="/ToDoList#/Todo"
+          onClick={() => {
+            DeleteDoTo(id);
+          }}
         >
           <i className="fa fa-times"></i>
         </a>
@@ -76,8 +149,14 @@ function ToDo() {
         <div className="conatiner todoListPage vhContainer">
             <div className="todoList_Content">
                 <div className="inputBox">
-                    <input type="text" placeholder="請輸入待辦事項"/>
-                    <a href="#">
+                    <input type="text" placeholder="請輸入待辦事項" value={inputItem} 
+                      onChange={(e) => {
+                        setInputItem(e.target.value);
+                      }}
+                      onKeyUp={(e) => {
+                        if (e.keyCode == 13) PostDoTo();
+                      }}/>
+                    <a href="/ToDoList#/Todo" onClick={PostDoTo}>
                         <i className="fa fa-plus"></i>
                     </a>
                 </div>
@@ -90,8 +169,8 @@ function ToDo() {
                     <div className="todoList_items">
                     <TodoListItem  />
                         <div className="todoList_statistics">
-                            <p> {todos.filter((data) => data.completed_at == false).length} 個待完成項目</p>
-                            <a href="#">清除已完成項目</a>
+                            <p> {todos.filter((data) => data.completed_at == null).length} 個待完成項目</p>
+                            <a href="/ToDoList#/Todo" onClick={ClearCompleted}>清除已完成項目</a>
                         </div>
                     </div>
                 </div>
