@@ -5,9 +5,50 @@ import { useAuth } from "../components/Context";
 
 function ToDo() {
   const { useState } = React;
-  const { token} = useAuth();
+  const { user, token} = useAuth();
   const [todos, setTodos] = useState([]);
   const [inputItem, setInputItem] = useState("");
+  const [actTab, setAactTab] = useState("全部");
+  const [tab, setTab] = useState([
+    { title: "全部", active: true },
+    { title: "待完成", active: false },
+    { title: "已完成", active: false }
+  ]);
+  function TabTodoListItem() {
+    if (actTab == "待完成") {
+      return (
+        <TodoListItem data={todos.filter((data) => data.completed_at == null)} />
+      );
+    } else if (actTab == "已完成") {
+      return (
+        <TodoListItem data={todos.filter((data) => data.completed_at != null)} />
+      );
+    }
+    return <TodoListItem data={todos} />;
+  }
+  function ListTab(props) {
+    const { title, active } = props.item;
+    return (
+      <li>
+        <a
+          href="/ToDoList#/Todo"
+          className={active == true ? "active" : ""}
+          onClick={() => {
+            setAactTab(title);
+            setTab(
+              tab.map((data) =>
+                data.title == title
+                  ? { ...data, active: true }
+                  : { ...data, active: false }
+              )
+            );
+          }}
+        >
+          {title}
+        </a>
+      </li>
+    );
+  }
   const PostDoTo = () => {
     if (inputItem.trim() === "") {
       return;
@@ -50,7 +91,7 @@ function ToDo() {
           ))
       })
   };
-  // 無法清除全部
+  // API可以全部清除，但顯示無法清除全部，需要上一頁再下一頁
   const ClearCompleted = () =>{
     let completedList = todos.filter((data) => data.completed_at);
     setTodos(todos.filter((data) => data.completed_at == null))
@@ -94,7 +135,7 @@ function ToDo() {
   useEffect(() => {
     GetData()
   }, [])
-  function TodoListItem() {
+  function TodoListItem({data}) {
     if (todos.length == 0) {
       return (
         <ul className="todoList_item">
@@ -104,7 +145,7 @@ function ToDo() {
     }
     return (
       <ul className="todoList_item">
-        {todos.map((item, i) => {
+        {data.map((item, i) => {
           return <ListItem key={i} item={item} />;
         })}
       </ul>
@@ -142,7 +183,7 @@ function ToDo() {
         <nav>
             <h1><a href="#">ONLINE TODO LIST</a></h1>
             <ul>
-                <li className="todo_sm"><a href="#"><span>王小明的代辦</span></a></li>
+                <li className="todo_sm"><a href="#"><span>{`${user?.nickname}的代辦`} </span></a></li>
                 <li><a href="#loginPage">登出</a></li>
             </ul>
         </nav>
@@ -161,13 +202,13 @@ function ToDo() {
                     </a>
                 </div>
                 <div className="todoList_list">
-                    <ul className="todoList_tab">
-                        <li><a href="#" className="active">全部</a></li>
-                        <li><a href="#">待完成</a></li>
-                        <li><a href="#">已完成</a></li>
-                    </ul>
+                <ul className="todoList_tab">
+                  {tab.map((item, i) => {
+                    return <ListTab key={i} item={item} />;
+                  })}
+                </ul>
                     <div className="todoList_items">
-                    <TodoListItem  />
+                    <TabTodoListItem />
                         <div className="todoList_statistics">
                             <p> {todos.filter((data) => data.completed_at == null).length} 個待完成項目</p>
                             <a href="/ToDoList#/Todo" onClick={ClearCompleted}>清除已完成項目</a>
