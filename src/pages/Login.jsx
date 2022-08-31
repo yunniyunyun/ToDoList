@@ -36,8 +36,6 @@ function Login() {
         return res.json()
        })
     .then((res, headers) => {
-        console.log('res',res)
-        console.log('token',headers)
         setLocalUser({
           nickname: res.nickname
         });

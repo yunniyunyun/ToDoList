@@ -1,10 +1,13 @@
 import '../App.css';
 import React from 'react';
+import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from 'react';
-import { useAuth, getLocalUser, getLocalToken } from "../components/Context";
+import { useAuth, getLocalUser, getLocalToken, clearLocalUser } from "../components/Context";
+import { SignOutAPI } from "../components/Api";
 
 function ToDo() {
   const { useState } = React;
+  const navigate = useNavigate();
   // const {token, setToken} = useAuth();
   const [todos, setTodos] = useState([]);
   const [inputItem, setInputItem] = useState("");
@@ -21,6 +24,11 @@ function ToDo() {
   //     setToken(authorization)
   //   }
   // }, [])
+  const LogOut = async () =>{
+    await SignOutAPI()
+    await clearLocalUser()
+    navigate('/')
+  }
 
   function TabTodoListItem() {
     if (actTab == "待完成") {
@@ -190,7 +198,7 @@ function ToDo() {
             <h1><a href="/ToDoList/#/Todo">ONLINE TODO LIST</a></h1>
             <ul>
                 <li className="todo_sm"><a href="/ToDoList/#/Todo"><span>{nickname}的代辦</span></a></li>
-                <li><a href="#loginPage">登出</a></li>
+                <li><a href="/ToDoList" onClick={LogOut}>登出</a></li>
             </ul>
         </nav>
         <div className="conatiner todoListPage vhContainer">
