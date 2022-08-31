@@ -39,7 +39,7 @@ function ToDo() {
     return (
       <li>
         <a
-          href="/ToDoList#/Todo"
+          href="/ToDoList/#/Todo"
           className={active == true ? "active" : ""}
           onClick={() => {
             setAactTab(title);
@@ -174,7 +174,7 @@ function ToDo() {
           <span>{content}</span>
         </label>
         <a
-          href="/ToDoList#/Todo"
+          href="/ToDoList/#/Todo"
           onClick={() => {
             DeleteDoTo(id);
           }}
@@ -189,7 +189,7 @@ function ToDo() {
         <nav>
             <h1><a href="/ToDoList/#/Todo">ONLINE TODO LIST</a></h1>
             <ul>
-                <li className="todo_sm"><a href="/ToDoList#/Todo"><span>{nickname}的代辦</span></a></li>
+                <li className="todo_sm"><a href="/ToDoList/#/Todo"><span>{nickname}的代辦</span></a></li>
                 <li><a href="#loginPage">登出</a></li>
             </ul>
         </nav>
@@ -203,7 +203,7 @@ function ToDo() {
                       onKeyUp={(e) => {
                         if (e.keyCode === 13) PostDoTo();
                       }}/>
-                    <a href="/ToDoList#/Todo" onClick={PostDoTo}>
+                    <a href="/ToDoList/#/Todo" onClick={PostDoTo}>
                         <i className="fa fa-plus"></i>
                     </a>
                 </div>
@@ -217,7 +217,7 @@ function ToDo() {
                     <TabTodoListItem />
                         <div className="todoList_statistics">
                             <p> {todos.filter((data) => data.completed_at === null).length} 個待完成項目</p>
-                            <a href="/ToDoList#/Todo" onClick={ClearCompleted}>清除已完成項目</a>
+                            <a href="/ToDoList/#/Todo" onClick={ClearCompleted}>清除已完成項目</a>
                         </div>
                     </div>
                 </div>
