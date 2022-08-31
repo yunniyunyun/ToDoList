@@ -1,11 +1,11 @@
 import '../App.css';
 import React from 'react';
 import { useEffect, useState } from 'react';
-import { useAuth } from "../components/Context";
+import { useAuth, getLocalUser, getLocalToken } from "../components/Context";
 
 function ToDo() {
   const { useState } = React;
-  const { user, token} = useAuth();
+  // const {token, setToken} = useAuth();
   const [todos, setTodos] = useState([]);
   const [inputItem, setInputItem] = useState("");
   const [actTab, setAactTab] = useState("全部");
@@ -14,6 +14,14 @@ function ToDo() {
     { title: "待完成", active: false },
     { title: "已完成", active: false }
   ]);
+  const { nickname} = getLocalUser();
+  const { authorization } = getLocalToken()
+  // useEffect(() => {
+  //   if (token == null){
+  //     setToken(authorization)
+  //   }
+  // }, [])
+
   function TabTodoListItem() {
     if (actTab == "待完成") {
       return (
@@ -37,7 +45,7 @@ function ToDo() {
             setAactTab(title);
             setTab(
               tab.map((data) =>
-                data.title == title
+                data.title === title
                   ? { ...data, active: true }
                   : { ...data, active: false }
               )
@@ -49,16 +57,16 @@ function ToDo() {
       </li>
     );
   }
-  const PostDoTo = () => {
+  const PostDoTo = async () => {
     if (inputItem.trim() === "") {
       return;
     }
     const _url = "https://todoo.5xcamp.us/todos";
-    fetch(_url, {
+    await fetch(_url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'authorization': token
+        'authorization': authorization
         },
       body: JSON.stringify({
         todo: {"content":inputItem}
@@ -68,53 +76,51 @@ function ToDo() {
         return res.json()
       })
       .then(res => {
-        setTodos([...todos, {id:res.id, content:res.content, completed_at:null}])
         setInputItem("")
       })
+      await GetData()
   };
-  const ToggleDoTo = (id) => {
+  const ToggleDoTo = async (id) => {
     const _url = "https://todoo.5xcamp.us/todos/"+id+"/toggle";
-    fetch(_url, {
+    await fetch(_url, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
-        'authorization': token
+        'authorization': authorization
         }
       })
       .then(res => {
         return res.json()
       })
-      .then(res =>{
-        setTodos(
-          todos.map((data) =>
-            data.id == id ? res : data
-          ))
-      })
+      // .then(res =>{
+      //   setTodos(
+      //     todos.map((data) =>
+      //       data.id == id ? res : data
+      //     ))
+      // })
+    // 順序會變動
+    await GetData()
   };
-  // API可以全部清除，但顯示無法清除全部，需要上一頁再下一頁
-  const ClearCompleted = () =>{
+  const ClearCompleted = async () =>{
     let completedList = todos.filter((data) => data.completed_at);
-    setTodos(todos.filter((data) => data.completed_at == null))
     for (const data of completedList) {
       const { id } = data;
-      DeleteDoTo(id);
+      await DeleteDoTo(id);
     }
   }
-  const DeleteDoTo = (id) => {
+  const DeleteDoTo = async (id) => {
     const _url = "https://todoo.5xcamp.us/todos/"+id;
-    fetch(_url, {
+    await fetch(_url, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
-        'authorization': token
+        'authorization': authorization
         }
       })
       .then(res => {
         return res.json()
       })
-      .then(res => {
-        setTodos(todos.filter((data) => data.id != id))
-      })
+    await GetData()
   };
   const GetData = () => {
     const _url = "https://todoo.5xcamp.us/todos";
@@ -122,9 +128,9 @@ function ToDo() {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        'authorization': token
+        'authorization': authorization
       }
-    })
+      })
       .then(res => {
         return res.json()
       })
@@ -136,7 +142,7 @@ function ToDo() {
     GetData()
   }, [])
   function TodoListItem({data}) {
-    if (todos.length == 0) {
+    if (todos.length === 0) {
       return (
         <ul className="todoList_item">
           <p className="todoList_none"> 目前尚無待辦事項</p>
@@ -181,9 +187,9 @@ function ToDo() {
   return (
     <div id="todoListPage" className="bg-half">
         <nav>
-            <h1><a href="#">ONLINE TODO LIST</a></h1>
+            <h1><a href="/ToDoList/#/Todo">ONLINE TODO LIST</a></h1>
             <ul>
-                <li className="todo_sm"><a href="#"><span>{`${user?.nickname}的代辦`} </span></a></li>
+                <li className="todo_sm"><a href="/ToDoList#/Todo"><span>{nickname}的代辦</span></a></li>
                 <li><a href="#loginPage">登出</a></li>
             </ul>
         </nav>
@@ -195,7 +201,7 @@ function ToDo() {
                         setInputItem(e.target.value);
                       }}
                       onKeyUp={(e) => {
-                        if (e.keyCode == 13) PostDoTo();
+                        if (e.keyCode === 13) PostDoTo();
                       }}/>
                     <a href="/ToDoList#/Todo" onClick={PostDoTo}>
                         <i className="fa fa-plus"></i>
@@ -210,7 +216,7 @@ function ToDo() {
                     <div className="todoList_items">
                     <TabTodoListItem />
                         <div className="todoList_statistics">
-                            <p> {todos.filter((data) => data.completed_at == null).length} 個待完成項目</p>
+                            <p> {todos.filter((data) => data.completed_at === null).length} 個待完成項目</p>
                             <a href="/ToDoList#/Todo" onClick={ClearCompleted}>清除已完成項目</a>
                         </div>
                     </div>
