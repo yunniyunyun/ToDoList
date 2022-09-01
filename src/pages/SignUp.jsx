@@ -78,7 +78,7 @@ function SignUp() {
                     <input className="formControls_input" type="password" name="pwd" id="pwd" placeholder="請輸入密碼" 
                     required {...register("password", {
                       required: { value: true, message: "此欄位必填" },
-                      minLength: { value: 8, message: "密碼至少為 8 碼" }
+                      minLength: { value: 6, message: "密碼至少為 6 碼" }
                     })}
                     value={pwd}
                      onChange={(e) => {
@@ -89,11 +89,11 @@ function SignUp() {
                     <label className="formControls_label" for="pwd">再次輸入密碼</label>
                     <input className="formControls_input" type="password" name="pwd" id="pwd" placeholder="請再次輸入密碼" required {...register("password2", {
                         required: true,
-                        minLength: 8,
+                        minLength: 6,
                         validate: isSame
                       })}/>
                     {errors.password2 && errors.password2.type === "required" && <span>此欄位必填</span>}
-                    {errors.password2 && errors.password2.type === "minLength" && <span>密碼至少為 8 碼</span>}
+                    {errors.password2 && errors.password2.type === "minLength" && <span>密碼至少為 6 碼</span>}
                     {errors.password2 && errors.password2.type === "validate" && <span>密碼不一致</span> }
                     <input className="formControls_btnSubmit" type="submit" onClick="javascript:location.href='#todoListPage'" value="註冊帳號"/>
                     <Link className='formControls_btnLink' to="/">登入</Link>

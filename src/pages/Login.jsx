@@ -1,6 +1,7 @@
 import '../App.css';
 import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
+import axios from 'axios';
 import { useAuth, setLocalUser, setLocalToken } from "../components/Context";
 import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
@@ -25,9 +26,8 @@ function Login() {
         })
     })
     .then(res => {
-        console.log(res)
         if(res.status===401){
-            throw new Error('登入失敗，請重新檢驗！');
+          throw new Error("電子信箱或密碼錯誤");
         }
         setToken(res.headers.get("authorization"));
         setLocalToken({
@@ -42,7 +42,7 @@ function Login() {
         navigate('/Todo')
       })
     .catch((err) => {
-        console.log(err);
+        console.log("err.error",err.error);
         return MySwal.fire({
           title: err.message,
           })
@@ -70,7 +70,7 @@ function Login() {
                     <label className="formControls_label" for="pwd">密碼</label>
                     <input className="formControls_input" type="password" name="pwd" id="pwd" placeholder="請輸入密碼" required {...register("password", {
                         required: { value: true, message: "此欄位必填" },
-                        minLength: { value: 8, message: "密碼至少為 8 碼" }
+                        minLength: { value: 6, message: "密碼至少為 6 碼" }
                       })}/>
                     <span>{errors.password?.message}</span>
                     <input className="formControls_btnSubmit" type="submit" onClick="javascript:location.href='#todoListPage'" value="登入"/>
